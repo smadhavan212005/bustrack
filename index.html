@@ -2,25 +2,80 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Mobile-Responsive Live Bus Tracker</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Bus Tracker - Enhanced Mobile</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="description" content="Real-time bus tracking system with live location updates">
+  <meta name="theme-color" content="#0ea5e9">
+  
   <!-- Leaflet CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
   <style>
+    :root {
+      --primary-blue: #0ea5e9;
+      --primary-blue-dark: #0284c7;
+      --secondary-blue: #3b82f6;
+      --accent-orange: #f59e0b;
+      --accent-red: #ef4444;
+      --success-green: #10b981;
+      --warning-yellow: #f59e0b;
+      --error-red: #ef4444;
+      --dark-slate: #0f172a;
+      --medium-slate: #1e293b;
+      --light-slate: #334155;
+      --text-primary: #1e293b;
+      --text-secondary: #64748b;
+      --text-muted: #94a3b8;
+      --bg-primary: #ffffff;
+      --bg-secondary: #f8fafc;
+      --bg-accent: #f1f5f9;
+      --border-light: rgba(226, 232, 240, 0.5);
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 20px;
+      --radius-2xl: 24px;
+      --spacing-xs: 4px;
+      --spacing-sm: 8px;
+      --spacing-md: 16px;
+      --spacing-lg: 24px;
+      --spacing-xl: 32px;
+      --spacing-2xl: 48px;
+    }
+
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
 
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      font-size: 16px;
+      scroll-behavior: smooth;
+      -webkit-text-size-adjust: 100%;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, var(--dark-slate) 0%, var(--medium-slate) 50%, var(--light-slate) 100%);
       min-height: 100vh;
-      color: #333;
+      color: var(--text-primary);
       position: relative;
       overflow-x: hidden;
+      line-height: 1.6;
+      -webkit-tap-highlight-color: transparent;
     }
 
     body::before {
@@ -30,60 +85,95 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background: radial-gradient(circle at 30% 20%, rgba(14, 165, 233, 0.1) 0%, transparent 50%),
-                  radial-gradient(circle at 70% 80%, rgba(59, 130, 246, 0.08) 0%, transparent 50%);
+      background: 
+        radial-gradient(circle at 25% 15%, rgba(14, 165, 233, 0.12) 0%, transparent 45%),
+        radial-gradient(circle at 75% 85%, rgba(59, 130, 246, 0.1) 0%, transparent 45%),
+        radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.05) 0%, transparent 50%);
       pointer-events: none;
       z-index: 0;
     }
 
     .container {
-      max-width: 1200px;
+      max-width: 1400px;
       margin: 0 auto;
-      padding: 20px;
+      padding: var(--spacing-md);
       position: relative;
       z-index: 1;
     }
 
+    /* Enhanced Header */
     .header {
       text-align: center;
-      margin-bottom: 30px;
-      animation: fadeInDown 0.8s ease-out;
+      margin-bottom: var(--spacing-xl);
+      animation: slideInDown 0.8s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    h1 {
-      font-size: clamp(2rem, 5vw, 2.5rem);
-      font-weight: 800;
-      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    .header h1 {
+      font-size: clamp(2.5rem, 8vw, 4rem);
+      font-weight: 900;
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 20%, #cbd5e1 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      text-shadow: 0 4px 8px rgba(0,0,0,0.3);
-      margin-bottom: 10px;
+      text-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      margin-bottom: var(--spacing-sm);
+      position: relative;
+      letter-spacing: -0.02em;
+    }
+
+    .header .subtitle {
+      color: rgba(241, 245, 249, 0.9);
+      font-size: clamp(1rem, 4vw, 1.25rem);
+      font-weight: 500;
+      letter-spacing: 0.025em;
+      margin-bottom: var(--spacing-md);
+    }
+
+    .header .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(12px);
+      padding: var(--spacing-sm) var(--spacing-md);
+      border-radius: var(--radius-xl);
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    /* Enhanced Main Card */
+    .tracker-card {
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(24px);
+      border-radius: var(--radius-2xl);
+      box-shadow: 
+        var(--shadow-xl),
+        0 0 0 1px rgba(255, 255, 255, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+      overflow: hidden;
+      animation: slideInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.2s both;
+      border: 1px solid var(--border-light);
       position: relative;
     }
 
-    .subtitle {
-      color: rgba(241, 245, 249, 0.8);
-      font-size: clamp(1rem, 3vw, 1.1rem);
-      font-weight: 400;
-      letter-spacing: 0.5px;
+    .tracker-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--primary-blue), var(--secondary-blue), var(--success-green));
+      z-index: 1;
     }
 
-    .tracker-card {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(20px);
-      border-radius: 24px;
-      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15), 
-                  0 0 0 1px rgba(255, 255, 255, 0.1);
-      overflow: hidden;
-      animation: fadeInUp 0.8s ease-out 0.2s both;
-      border: 1px solid rgba(226, 232, 240, 0.2);
-    }
-
+    /* Enhanced Map Container */
     .map-container {
       position: relative;
-      height: clamp(300px, 50vh, 500px);
-      border-radius: 24px 24px 0 0;
+      height: clamp(350px, 60vh, 600px);
+      border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
       overflow: hidden;
     }
 
@@ -96,55 +186,56 @@
 
     .map-overlay {
       position: absolute;
-      top: 15px;
-      right: 15px;
+      top: var(--spacing-md);
+      left: var(--spacing-md);
+      right: var(--spacing-md);
       z-index: 1000;
-      background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.8) 100%);
-      backdrop-filter: blur(12px);
-      padding: 12px 16px;
-      border-radius: 16px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-      font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.9) 100%);
+      backdrop-filter: blur(16px);
+      padding: var(--spacing-md) var(--spacing-lg);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-lg);
+      font-size: clamp(0.875rem, 3vw, 1rem);
       font-weight: 600;
       color: #f1f5f9;
-      animation: pulse 2s infinite;
-      border: 1px solid rgba(148, 163, 184, 0.2);
-      max-width: calc(100vw - 60px);
-      word-wrap: break-word;
+      animation: pulse 3s infinite;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--spacing-sm);
+      text-align: center;
     }
 
+    /* Enhanced Info Section */
     .info-section {
-      padding: clamp(20px, 5vw, 30px);
-      background: white;
+      padding: var(--spacing-xl);
+      background: var(--bg-primary);
     }
 
-    .info-grid {
+    .quick-stats {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
-      gap: clamp(15px, 4vw, 25px);
-      margin-bottom: clamp(20px, 5vw, 30px);
-      width: 100%;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--spacing-lg);
+      margin-bottom: var(--spacing-xl);
     }
 
-    .info-card {
-      background: linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%);
-      padding: clamp(24px, 5vw, 32px);
-      border-radius: 20px;
+    .stat-card {
+      background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+      padding: var(--spacing-xl);
+      border-radius: var(--radius-xl);
       text-align: center;
       color: white;
-      box-shadow: 0 12px 25px rgba(14, 165, 233, 0.25),
-                  0 0 0 1px rgba(255, 255, 255, 0.1);
+      box-shadow: 
+        var(--shadow-lg),
+        0 0 0 1px rgba(255, 255, 255, 0.1);
       transform: translateY(0);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      min-height: clamp(100px, 15vw, 130px);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       position: relative;
       overflow: hidden;
     }
 
-    .info-card::before {
+    .stat-card::before {
       content: '';
       position: absolute;
       top: 0;
@@ -156,139 +247,95 @@
       transition: opacity 0.3s ease;
     }
 
-    .info-card:hover::before {
+    .stat-card:hover::before {
       opacity: 1;
     }
 
-    .info-card:nth-child(2) {
-      background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
-      box-shadow: 0 12px 25px rgba(6, 182, 212, 0.25),
-                  0 0 0 1px rgba(255, 255, 255, 0.1);
-    }
-
     @media (hover: hover) {
-      .info-card:hover {
+      .stat-card:hover {
         transform: translateY(-8px) scale(1.02);
-        box-shadow: 0 20px 40px rgba(14, 165, 233, 0.3),
-                    0 0 0 1px rgba(255, 255, 255, 0.2);
-      }
-
-      .info-card:nth-child(2):hover {
-        box-shadow: 0 20px 40px rgba(6, 182, 212, 0.3),
-                    0 0 0 1px rgba(255, 255, 255, 0.2);
+        box-shadow: 
+          0 25px 50px rgba(14, 165, 233, 0.3),
+          0 0 0 1px rgba(255, 255, 255, 0.2);
       }
     }
 
-    .info-label {
-      font-size: clamp(0.85rem, 2.5vw, 1rem);
+    .stat-card.active-buses {
+      background: linear-gradient(135deg, var(--success-green) 0%, #059669 100%);
+    }
+
+    .stat-card.avg-distance {
+      background: linear-gradient(135deg, var(--accent-orange) 0%, #d97706 100%);
+    }
+
+    .stat-card.next-arrival {
+      background: linear-gradient(135deg, var(--error-red) 0%, #dc2626 100%);
+    }
+
+    .stat-label {
+      font-size: clamp(0.875rem, 3vw, 1rem);
       font-weight: 600;
-      opacity: 0.9;
-      margin-bottom: clamp(10px, 3vw, 14px);
+      opacity: 0.95;
+      margin-bottom: var(--spacing-md);
       text-transform: uppercase;
-      letter-spacing: 1px;
-      position: relative;
-      z-index: 1;
+      letter-spacing: 0.05em;
     }
 
-    .info-value {
-      font-size: clamp(2rem, 6vw, 2.8rem);
-      font-weight: 800;
+    .stat-value {
+      font-size: clamp(2.5rem, 8vw, 3.5rem);
+      font-weight: 900;
       line-height: 1;
-      position: relative;
-      z-index: 1;
       text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
-    .info-unit {
-      font-size: clamp(1rem, 3vw, 1.2rem);
+    .stat-unit {
+      font-size: clamp(1rem, 3vw, 1.25rem);
       font-weight: 600;
       opacity: 0.9;
-      margin-left: 6px;
+      margin-left: var(--spacing-xs);
     }
 
-    .status-bar {
-      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-      padding: clamp(16px, 4vw, 18px) clamp(20px, 5vw, 28px);
-      border-radius: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      color: white;
-      font-weight: 500;
-      box-shadow: 0 8px 25px rgba(15, 23, 42, 0.4);
-      border: 1px solid rgba(148, 163, 184, 0.1);
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-
-    .status-indicator {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex: 1;
-      min-width: 200px;
-    }
-
-    .pulse-dot {
-      width: 12px;
-      height: 12px;
-      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-      border-radius: 50%;
-      animation: pulse 2s infinite;
-      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
-      flex-shrink: 0;
-    }
-
-    .last-updated {
-      font-size: clamp(0.75rem, 2vw, 0.85rem);
-      opacity: 0.8;
-      color: #cbd5e1;
-      text-align: right;
-    }
-
-    /* Bus Information Section */
+    /* Enhanced Bus Information */
     .bus-info-section {
-      margin: clamp(20px, 5vw, 30px) 0;
+      margin: var(--spacing-xl) 0;
     }
 
     .section-title {
-      font-size: clamp(1.3rem, 4vw, 1.6rem);
-      font-weight: 700;
-      background: linear-gradient(135deg, #1e293b 0%, #374151 100%);
+      font-size: clamp(1.5rem, 5vw, 2rem);
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      margin-bottom: 24px;
+      margin-bottom: var(--spacing-xl);
       text-align: center;
       letter-spacing: -0.025em;
     }
 
-    /* Desktop Table Styles */
+    /* Enhanced Table Styles */
     .table-container {
-      background: white;
-      border-radius: 20px;
+      background: var(--bg-primary);
+      border-radius: var(--radius-xl);
       overflow: hidden;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08),
-                  0 0 0 1px rgba(226, 232, 240, 0.5);
-      border: 1px solid rgba(226, 232, 240, 0.3);
-      display: block;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border-light);
     }
 
     .bus-info-table {
       width: 100%;
       border-collapse: collapse;
-      font-size: clamp(0.8rem, 2.5vw, 0.95rem);
+      font-size: clamp(0.875rem, 3vw, 1rem);
     }
 
     .bus-info-table th {
-      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      background: linear-gradient(135deg, var(--dark-slate) 0%, var(--medium-slate) 100%);
       color: #f8fafc;
-      padding: clamp(16px, 4vw, 20px) clamp(12px, 3vw, 16px);
+      padding: var(--spacing-lg);
       text-align: center;
       font-weight: 700;
-      font-size: clamp(0.75rem, 2vw, 0.9rem);
+      font-size: clamp(0.8rem, 2.5vw, 0.95rem);
       text-transform: uppercase;
-      letter-spacing: 0.8px;
+      letter-spacing: 0.05em;
       position: relative;
     }
 
@@ -298,14 +345,14 @@
       bottom: 0;
       left: 0;
       right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, #0ea5e9 0%, #3b82f6 100%);
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
     }
 
     .bus-info-table td {
-      padding: clamp(16px, 4vw, 20px) clamp(12px, 3vw, 16px);
+      padding: var(--spacing-lg);
       text-align: center;
-      border-bottom: 1px solid rgba(226, 232, 240, 0.5);
+      border-bottom: 1px solid var(--border-light);
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       position: relative;
     }
@@ -314,185 +361,229 @@
       .bus-info-table tr:hover td {
         background: linear-gradient(135deg, rgba(14, 165, 233, 0.05) 0%, rgba(59, 130, 246, 0.03) 100%);
         transform: scale(1.01);
-        box-shadow: 0 4px 12px rgba(14, 165, 233, 0.1);
       }
     }
 
     .bus-number {
       font-weight: 800;
-      font-size: clamp(1rem, 3vw, 1.2rem);
-      color: #0ea5e9;
+      font-size: clamp(1rem, 3vw, 1.25rem);
+      color: var(--primary-blue);
       background: linear-gradient(135deg, rgba(14, 165, 233, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%);
-      border-radius: 10px;
-      font-family: 'Inter', monospace;
-      padding: 6px 8px;
+      border-radius: var(--radius-md);
+      padding: var(--spacing-sm) var(--spacing-md);
       display: inline-block;
+      border: 1px solid rgba(14, 165, 233, 0.2);
     }
 
     .bus-number-2 {
-      color: #dc2626;
-      background: linear-gradient(135deg, rgba(220, 38, 38, 0.1) 0%, rgba(239, 68, 68, 0.1) 100%);
+      color: var(--error-red);
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.1) 100%);
+      border-color: rgba(239, 68, 68, 0.2);
     }
 
-    .route-point {
+    .status-online {
+      color: var(--success-green);
       font-weight: 600;
-      color: #1e293b;
-      position: relative;
     }
 
-    .route-point::before {
-      content: '📍';
-      margin-right: 8px;
-      font-size: 1.1em;
+    .status-offline {
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .distance-cell,
+    .eta-cell,
+    .capacity-cell {
+      font-weight: 700;
+      border-radius: var(--radius-sm);
+      padding: var(--spacing-sm) var(--spacing-md);
     }
 
     .distance-cell {
-      font-weight: 700;
-      color: #059669;
-      background: linear-gradient(135deg, rgba(5, 150, 105, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%);
-      border-radius: 8px;
-      padding: 6px 8px;
+      color: var(--success-green);
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.05) 100%);
     }
 
     .eta-cell {
-      font-weight: 700;
-      color: #dc2626;
-      background: linear-gradient(135deg, rgba(220, 38, 38, 0.1) 0%, rgba(239, 68, 68, 0.05) 100%);
-      border-radius: 8px;
-      position: relative;
-      padding: 6px 8px;
-    }
-
-    .eta-cell::before {
-      content: '⏱';
-      margin-right: 6px;
-      font-size: 1em;
+      color: var(--error-red);
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.05) 100%);
     }
 
     .capacity-cell {
-      font-weight: 700;
-      color: #7c3aed;
-      background: linear-gradient(135deg, rgba(124, 58, 237, 0.1) 0%, rgba(139, 92, 246, 0.05) 100%);
-      border-radius: 8px;
-      position: relative;
-      padding: 6px 8px;
+      color: var(--secondary-blue);
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(37, 99, 235, 0.05) 100%);
     }
 
-    /* Mobile Card Layout */
+    /* Enhanced Mobile Cards */
     .mobile-cards {
       display: none;
+      gap: var(--spacing-lg);
     }
 
     .bus-card {
-      background: white;
-      border-radius: 16px;
-      padding: 20px;
-      margin-bottom: 16px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      border: 1px solid rgba(226, 232, 240, 0.5);
+      background: var(--bg-primary);
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-xl);
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--border-light);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .bus-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
     }
 
     .bus-card-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 16px;
-      padding-bottom: 12px;
-      border-bottom: 2px solid #f1f5f9;
+      margin-bottom: var(--spacing-lg);
+      padding-bottom: var(--spacing-md);
+      border-bottom: 2px solid var(--bg-accent);
     }
 
     .bus-card-number {
       font-size: 1.5rem;
       font-weight: 800;
-      color: #0ea5e9;
+      color: var(--primary-blue);
       background: linear-gradient(135deg, rgba(14, 165, 233, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%);
-      padding: 8px 12px;
-      border-radius: 12px;
+      padding: var(--spacing-md) var(--spacing-lg);
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(14, 165, 233, 0.2);
     }
 
     .bus-card-number.bus-2 {
-      color: #dc2626;
-      background: linear-gradient(135deg, rgba(220, 38, 38, 0.1) 0%, rgba(239, 68, 68, 0.1) 100%);
+      color: var(--error-red);
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.1) 100%);
+      border-color: rgba(239, 68, 68, 0.2);
+    }
+
+    .bus-card-status {
+      font-weight: 600;
+      padding: var(--spacing-sm) var(--spacing-md);
+      border-radius: var(--radius-sm);
+      font-size: 0.875rem;
+    }
+
+    .bus-card-status.online {
+      color: var(--success-green);
+      background: rgba(16, 185, 129, 0.1);
+    }
+
+    .bus-card-status.offline {
+      color: var(--text-muted);
+      background: rgba(148, 163, 184, 0.1);
     }
 
     .bus-card-info {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--spacing-lg);
     }
 
     .bus-card-item {
       text-align: center;
+      padding: var(--spacing-md);
+      background: var(--bg-secondary);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-light);
     }
 
     .bus-card-label {
       font-size: 0.75rem;
       font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: #64748b;
-      margin-bottom: 4px;
+      letter-spacing: 0.05em;
+      color: var(--text-secondary);
+      margin-bottom: var(--spacing-xs);
     }
 
     .bus-card-value {
-      font-size: 0.9rem;
+      font-size: 1.125rem;
       font-weight: 700;
-      color: #1e293b;
+      color: var(--text-primary);
     }
 
     .bus-card-route {
       grid-column: 1 / -1;
       text-align: center;
-      padding: 12px;
-      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-      border-radius: 8px;
-      margin-top: 8px;
+      padding: var(--spacing-lg);
+      background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-accent) 100%);
+      border-radius: var(--radius-md);
+      margin-top: var(--spacing-md);
+      border: 1px solid var(--border-light);
     }
 
-    .bus-card-route .bus-card-value {
-      color: #475569;
-      font-size: 0.85rem;
-    }
-
-    /* Custom Leaflet marker styles */
-    .bus-marker {
-      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      border: 3px solid white;
-      box-shadow: 0 6px 12px rgba(245, 158, 11, 0.4),
-                  0 0 0 4px rgba(245, 158, 11, 0.1);
+    /* Enhanced Status Bar */
+    .status-bar {
+      background: linear-gradient(135deg, var(--dark-slate) 0%, var(--medium-slate) 100%);
+      padding: var(--spacing-lg) var(--spacing-xl);
+      border-radius: var(--radius-xl);
       display: flex;
       align-items: center;
-      justify-content: center;
-      font-size: 16px;
+      justify-content: space-between;
+      color: white;
+      font-weight: 600;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      flex-wrap: wrap;
+      gap: var(--spacing-md);
     }
 
-    .bus-marker-2 {
-      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-      box-shadow: 0 6px 12px rgba(239, 68, 68, 0.4),
-                  0 0 0 4px rgba(239, 68, 68, 0.1);
-    }
-
-    .stop-marker {
-      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      border: 3px solid white;
-      box-shadow: 0 6px 12px rgba(16, 185, 129, 0.4),
-                  0 0 0 4px rgba(16, 185, 129, 0.1);
+    .status-indicator {
       display: flex;
       align-items: center;
-      justify-content: center;
-      font-size: 14px;
+      gap: var(--spacing-md);
+      flex: 1;
+      min-width: 200px;
     }
 
-    @keyframes fadeInDown {
+    .pulse-dot {
+      width: 14px;
+      height: 14px;
+      background: linear-gradient(135deg, var(--success-green) 0%, #059669 100%);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+      flex-shrink: 0;
+    }
+
+    .pulse-dot.loading {
+      background: linear-gradient(135deg, var(--warning-yellow) 0%, #d97706 100%);
+      box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7);
+    }
+
+    .pulse-dot.error {
+      background: linear-gradient(135deg, var(--error-red) 0%, #dc2626 100%);
+      box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+      animation: none;
+    }
+
+    .last-updated {
+      font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+      opacity: 0.9;
+      color: #cbd5e1;
+      text-align: right;
+    }
+
+    /* Enhanced Loading Animation */
+    .loading {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top: 2px solid #fff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-right: var(--spacing-sm);
+    }
+
+    /* Keyframe Animations */
+    @keyframes slideInDown {
       from {
         opacity: 0;
-        transform: translateY(-30px);
+        transform: translateY(-50px);
       }
       to {
         opacity: 1;
@@ -500,10 +591,10 @@
       }
     }
 
-    @keyframes fadeInUp {
+    @keyframes slideInUp {
       from {
         opacity: 0;
-        transform: translateY(30px);
+        transform: translateY(50px);
       }
       to {
         opacity: 1;
@@ -516,37 +607,50 @@
         box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
       }
       70% {
-        box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+        box-shadow: 0 0 0 12px rgba(16, 185, 129, 0);
       }
       100% {
         box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
       }
     }
 
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
     /* Mobile Responsive Breakpoints */
+    @media (max-width: 1024px) {
+      .container {
+        padding: var(--spacing-md);
+      }
+      
+      .info-section {
+        padding: var(--spacing-lg);
+      }
+    }
+
     @media (max-width: 768px) {
       .container {
-        padding: 15px;
+        padding: var(--spacing-sm);
       }
 
       .map-overlay {
-        top: 10px;
-        right: 10px;
-        left: 10px;
-        text-align: center;
-        font-size: 0.8rem;
-        padding: 10px 14px;
+        top: var(--spacing-sm);
+        left: var(--spacing-sm);
+        right: var(--spacing-sm);
+        padding: var(--spacing-md);
       }
 
-      .info-grid {
+      .quick-stats {
         grid-template-columns: 1fr;
-        gap: 16px;
+        gap: var(--spacing-md);
       }
 
       .status-bar {
         flex-direction: column;
         text-align: center;
-        gap: 12px;
+        gap: var(--spacing-md);
       }
 
       .status-indicator {
@@ -558,93 +662,57 @@
         text-align: center;
       }
 
-      /* Hide table, show cards on mobile */
+      /* Show mobile cards, hide table */
       .table-container .bus-info-table {
         display: none;
       }
 
       .mobile-cards {
-        display: block;
+        display: flex;
+        flex-direction: column;
       }
     }
 
     @media (max-width: 480px) {
       .container {
-        padding: 10px;
+        padding: var(--spacing-xs);
       }
 
       .tracker-card {
-        border-radius: 16px;
+        border-radius: var(--radius-lg);
       }
 
       .map-container {
-        border-radius: 16px 16px 0 0;
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
         height: 300px;
       }
 
       .info-section {
-        padding: 16px;
+        padding: var(--spacing-md);
       }
 
       .bus-card {
-        padding: 16px;
+        padding: var(--spacing-lg);
       }
 
       .bus-card-info {
         grid-template-columns: 1fr;
-        gap: 12px;
-      }
-
-      .bus-card-item {
-        padding: 8px;
-        background: #f8fafc;
-        border-radius: 8px;
+        gap: var(--spacing-md);
       }
     }
 
-    /* Tablet Styles */
-    @media (min-width: 769px) and (max-width: 1024px) {
-      .info-grid {
-        grid-template-columns: repeat(2, 1fr);
+    /* Touch and Accessibility Improvements */
+    @media (hover: none) {
+      .stat-card:active {
+        transform: scale(0.98);
       }
-
-      .bus-info-table th,
-      .bus-info-table td {
-        padding: 16px 12px;
-        font-size: 0.9rem;
+      
+      .bus-card:active {
+        transform: scale(0.98);
       }
     }
 
-    /* Large Screen Optimizations */
-    @media (min-width: 1200px) {
-      .map-container {
-        height: 600px;
-      }
-    }
-
-    /* Smooth transitions for info values */
-    #distance, #eta, #table-eta-1, #table-eta-2 {
-      transition: all 0.3s ease;
-    }
-
-    /* Loading animation */
-    .loading {
-      display: inline-block;
-      width: 12px;
-      height: 12px;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      border-top: 2px solid #fff;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin-right: 8px;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    /* Accessibility improvements */
+    /* Reduced Motion Support */
     @media (prefers-reduced-motion: reduce) {
       * {
         animation-duration: 0.01ms !important;
@@ -653,18 +721,90 @@
       }
     }
 
-    /* High contrast mode support */
+    /* High Contrast Mode */
     @media (prefers-contrast: high) {
-      .info-card {
+      .stat-card,
+      .bus-card,
+      .table-container {
         border: 2px solid #000;
       }
-      
-      .bus-info-table th {
-        border: 1px solid #000;
+    }
+
+    /* Dark Mode Support */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-primary: #1e293b;
+        --bg-secondary: #0f172a;
+        --bg-accent: #334155;
+        --text-primary: #f1f5f9;
+        --text-secondary: #cbd5e1;
+        --border-light: rgba(148, 163, 184, 0.3);
       }
-      
-      .bus-info-table td {
-        border: 1px solid #666;
+    }
+
+    /* Custom Leaflet Styles */
+    .leaflet-popup-content-wrapper {
+      border-radius: var(--radius-md) !important;
+      box-shadow: var(--shadow-lg) !important;
+    }
+
+    .leaflet-popup-tip {
+      background: white !important;
+      box-shadow: var(--shadow-md) !important;
+    }
+
+    /* Enhanced Bus Markers */
+    .bus-marker {
+      background: linear-gradient(135deg, var(--accent-orange) 0%, #d97706 100%);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 3px solid white;
+      box-shadow: 
+        0 8px 16px rgba(245, 158, 11, 0.4),
+        0 0 0 4px rgba(245, 158, 11, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      transition: all 0.3s ease;
+    }
+
+    .bus-marker-2 {
+      background: linear-gradient(135deg, var(--error-red) 0%, #dc2626 100%);
+      box-shadow: 
+        0 8px 16px rgba(239, 68, 68, 0.4),
+        0 0 0 4px rgba(239, 68, 68, 0.1);
+    }
+
+    .bus-marker-active {
+      animation: bounce 2s infinite;
+    }
+
+    .stop-marker {
+      background: linear-gradient(135deg, var(--success-green) 0%, #059669 100%);
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 3px solid white;
+      box-shadow: 
+        0 8px 16px rgba(16, 185, 129, 0.4),
+        0 0 0 4px rgba(16, 185, 129, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+      }
+      40% {
+        transform: translateY(-8px);
+      }
+      60% {
+        transform: translateY(-4px);
       }
     }
   </style>
@@ -674,52 +814,75 @@
 <div class="container">
   <div class="header">
     <h1>Live Bus Tracker</h1>
-    <p class="subtitle">Real-time tracking of 2 buses with live location updates</p>
+    <p class="subtitle">Real-time bus location tracking system</p>
+    <div class="status-badge">
+      <div class="pulse-dot" id="header-status"></div>
+      <span id="header-status-text">Initializing...</span>
+    </div>
   </div>
 
   <div class="tracker-card">
     <div class="map-container">
       <div class="map-overlay">
         <div class="loading" id="loading" style="display: none;"></div>
-        <span>Live Tracking - 2 Buses</span>
+        <span id="status-text">Connecting to tracking system...</span>
       </div>
       <div id="map"></div>
     </div>
     
     <div class="info-section">
+      <!-- Quick Stats -->
+      <div class="quick-stats">
+        <div class="stat-card active-buses">
+          <div class="stat-label">Active Buses</div>
+          <div class="stat-value" id="active-count">0</div>
+        </div>
+        <div class="stat-card avg-distance">
+          <div class="stat-label">Avg Distance</div>
+          <div class="stat-value">
+            <span id="avg-distance">--</span>
+            <span class="stat-unit">km</span>
+          </div>
+        </div>
+        <div class="stat-card next-arrival">
+          <div class="stat-label">Next Arrival</div>
+          <div class="stat-value">
+            <span id="next-eta">--</span>
+            <span class="stat-unit">min</span>
+          </div>
+        </div>
+      </div>
+
       <!-- Bus Information Section -->
       <div class="bus-info-section">
-        <h3 class="section-title">Bus Information</h3>
+        <h3 class="section-title">Live Bus Information</h3>
         
         <!-- Desktop Table View -->
         <div class="table-container">
           <table class="bus-info-table">
             <thead>
               <tr>
-                <th>Bus Number</th>
-                <th>Start Point</th>
-                <th>End Point</th>
-                <th>Total Distance</th>
+                <th>Bus Route</th>
+                <th>Status</th>
+                <th>Distance</th>
                 <th>ETA</th>
-                <th>Seat Occupancy</th>
+                <th>Occupancy</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td class="bus-number">20A</td>
-                <td class="route-point">Gandhipuram</td>
-                <td class="route-point">Somanur</td>
-                <td class="distance-cell">29 km</td>
+                <td><span class="bus-number">Route A</span></td>
+                <td><span id="bus1-status" class="status-offline">Offline</span></td>
+                <td class="distance-cell"><span id="distance1">--</span> km</td>
                 <td class="eta-cell"><span id="table-eta-1">--</span> min</td>
-                <td class="capacity-cell">20/45 seats</td>
+                <td class="capacity-cell"><span id="seats1">--</span>%</td>
               </tr>
               <tr>
-                <td class="bus-number bus-number-2">90A</td>
-                <td class="route-point">Ukkadam</td>
-                <td class="route-point">Somanur</td>
-                <td class="distance-cell">33 km</td>
+                <td><span class="bus-number bus-number-2">Route B</span></td>
+                <td><span id="bus2-status" class="status-offline">Offline</span></td>
+                <td class="distance-cell"><span id="distance2">--</span> km</td>
                 <td class="eta-cell"><span id="table-eta-2">--</span> min</td>
-                <td class="capacity-cell">32/45 seats</td>
+                <td class="capacity-cell"><span id="seats2">--</span>%</td>
               </tr>
             </tbody>
           </table>
@@ -728,64 +891,58 @@
           <div class="mobile-cards">
             <div class="bus-card">
               <div class="bus-card-header">
-                <div class="bus-card-number">20A</div>
+                <div class="bus-card-number">Route A</div>
+                <div class="bus-card-status offline" id="mobile-status-1">Offline</div>
               </div>
               <div class="bus-card-info">
                 <div class="bus-card-item">
-                  <div class="bus-card-label">From</div>
-                  <div class="bus-card-value">📍 Gandhipuram</div>
-                </div>
-                <div class="bus-card-item">
-                  <div class="bus-card-label">To</div>
-                  <div class="bus-card-value">📍 Somanur</div>
-                </div>
-                <div class="bus-card-item">
                   <div class="bus-card-label">Distance</div>
-                  <div class="bus-card-value">29 km</div>
+                  <div class="bus-card-value"><span id="mobile-distance-1">--</span> km</div>
                 </div>
                 <div class="bus-card-item">
                   <div class="bus-card-label">ETA</div>
-                  <div class="bus-card-value">⏱ <span id="mobile-eta-1">--</span> min</div>
+                  <div class="bus-card-value"><span id="mobile-eta-1">--</span> min</div>
                 </div>
                 <div class="bus-card-item">
                   <div class="bus-card-label">Occupancy</div>
-                  <div class="bus-card-value">20/45 seats</div>
+                  <div class="bus-card-value"><span id="mobile-seats-1">--</span>%</div>
+                </div>
+                <div class="bus-card-item">
+                  <div class="bus-card-label">Speed</div>
+                  <div class="bus-card-value"><span id="mobile-speed-1">--</span> km/h</div>
                 </div>
                 <div class="bus-card-route">
-                  <div class="bus-card-label">Route</div>
-                  <div class="bus-card-value">Gandhipuram → Somanur</div>
+                  <div class="bus-card-label">Last Update</div>
+                  <div class="bus-card-value" id="mobile-update-1">--</div>
                 </div>
               </div>
             </div>
 
             <div class="bus-card">
               <div class="bus-card-header">
-                <div class="bus-card-number bus-2">90A</div>
+                <div class="bus-card-number bus-2">Route B</div>
+                <div class="bus-card-status offline" id="mobile-status-2">Offline</div>
               </div>
               <div class="bus-card-info">
                 <div class="bus-card-item">
-                  <div class="bus-card-label">From</div>
-                  <div class="bus-card-value">📍 Ukkadam</div>
-                </div>
-                <div class="bus-card-item">
-                  <div class="bus-card-label">To</div>
-                  <div class="bus-card-value">📍 Somanur</div>
-                </div>
-                <div class="bus-card-item">
                   <div class="bus-card-label">Distance</div>
-                  <div class="bus-card-value">33 km</div>
+                  <div class="bus-card-value"><span id="mobile-distance-2">--</span> km</div>
                 </div>
                 <div class="bus-card-item">
                   <div class="bus-card-label">ETA</div>
-                  <div class="bus-card-value">⏱ <span id="mobile-eta-2">--</span> min</div>
+                  <div class="bus-card-value"><span id="mobile-eta-2">--</span> min</div>
                 </div>
                 <div class="bus-card-item">
                   <div class="bus-card-label">Occupancy</div>
-                  <div class="bus-card-value">32/45 seats</div>
+                  <div class="bus-card-value"><span id="mobile-seats-2">--</span>%</div>
+                </div>
+                <div class="bus-card-item">
+                  <div class="bus-card-label">Speed</div>
+                  <div class="bus-card-value"><span id="mobile-speed-2">--</span> km/h</div>
                 </div>
                 <div class="bus-card-route">
-                  <div class="bus-card-label">Route</div>
-                  <div class="bus-card-value">Ukkadam → Somanur</div>
+                  <div class="bus-card-label">Last Update</div>
+                  <div class="bus-card-value" id="mobile-update-2">--</div>
                 </div>
               </div>
             </div>
@@ -795,8 +952,8 @@
       
       <div class="status-bar">
         <div class="status-indicator">
-          <div class="pulse-dot"></div>
-          <span>System Online - Tracking 2 Buses</span>
+          <div class="pulse-dot" id="connection-status"></div>
+          <span id="status-message">System initializing...</span>
         </div>
         <div class="last-updated">
           Last updated: <span id="lastUpdate">--</span>
@@ -807,217 +964,645 @@
 </div>
 
 <!-- Leaflet JS -->
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-  // Bus stops coordinates
-  const GANDHIPURAM_COORDS = { lat: 11.0168, lon: 76.9558 };  // Gandhipuram
-  const SOMANUR_COORDS = { lat: 11.0871, lon: 77.1859 };      // Somanur
-  const UKKADAM_COORDS = { lat: 11.0082, lon: 76.9287 };      // Ukkadam
-
-  const BUS_SPEED_KMPH = 45;
-  const THINGSPEAK_CHANNEL_ID = "3014758";
-
-  // Bus configurations
-  const buses = {
-    bus1: {
-      apiKey: "DIG2NXTYIJA4OLFW",
-      number: "20A",
-      startPoint: GANDHIPURAM_COORDS,
-      endPoint: SOMANUR_COORDS,
-      marker: null,
-      color: '#f59e0b'
+  // Enhanced Configuration
+  const CONFIG = {
+    busStop: { lat: 10.829043, lng: 78.688642 },
+    updateInterval: 8000, // 8 seconds for more frequent updates
+    averageSpeed: 45, // km/h
+    maxSeats: 50,
+    channels: {
+      bus1: {
+        position: { id: 3014758, key: "DIG2NXTYIJA4OLFW" },
+        occupancy: { id: 3015655, key: "7NOQT3SUFA3YZ2RZ" }
+      },
+      bus2: {
+        position: { id: 3015435, key: "O0RWN5VVNG51JE8J" },
+        occupancy: { id: 3015680, key: "92Q1MSPZ6B28JHDC" }
+      }
     },
-    bus2: {
-      apiKey: "O0RWN5VVNG51JE8J",
-      number: "90A",
-      startPoint: UKKADAM_COORDS,
-      endPoint: SOMANUR_COORDS,
-      marker: null,
-      color: '#ef4444'
+    map: {
+      defaultZoom: 14,
+      maxZoom: 18,
+      minZoom: 10
     }
   };
 
-  // Initialize map centered between all stops
-  const centerLat = (GANDHIPURAM_COORDS.lat + SOMANUR_COORDS.lat + UKKADAM_COORDS.lat) / 3;
-  const centerLon = (GANDHIPURAM_COORDS.lon + SOMANUR_COORDS.lon + UKKADAM_COORDS.lon) / 3;
-  const map = L.map('map').setView([centerLat, centerLon], 11);
+  // Enhanced State Management
+  let appState = {
+    buses: {
+      bus1: { 
+        name: 'Route A',
+        status: 'inactive',
+        lastPosition: null,
+        previousPosition: null,
+        distance: 0,
+        eta: 0,
+        occupancy: 0,
+        speed: 0,
+        lastUpdate: null
+      },
+      bus2: { 
+        name: 'Route B',
+        status: 'inactive',
+        lastPosition: null,
+        previousPosition: null,
+        distance: 0,
+        eta: 0,
+        occupancy: 0,
+        speed: 0,
+        lastUpdate: null
+      }
+    },
+    systemStatus: {
+      isOnline: false,
+      activeBuses: 0,
+      avgDistance: 0,
+      nextEta: null,
+      lastUpdate: null
+    },
+    ui: {
+      isInitialized: false,
+      updateInProgress: false
+    }
+  };
 
-  // Use OpenStreetMap tiles (free alternative)
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap contributors',
-    maxZoom: 18
-  }).addTo(map);
+  // Initialize Enhanced Map
+  const map = L.map('map', {
+    zoomControl: true,
+    scrollWheelZoom: true,
+    doubleClickZoom: true,
+    touchZoom: true,
+    dragging: true,
+    tap: true,
+    keyboard: true
+  }).setView([CONFIG.busStop.lat, CONFIG.busStop.lng], CONFIG.map.defaultZoom);
 
-  // Custom bus icons
-  const bus1Icon = L.divIcon({
-    className: 'bus-marker',
-    html: '🚌',
+  // Add enhanced tile layer with error handling
+  const tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors',
+    maxZoom: CONFIG.map.maxZoom,
+    minZoom: CONFIG.map.minZoom,
+    crossOrigin: true
+  });
+
+  tileLayer.on('tileerror', function(e) {
+    console.warn('Tile loading error:', e);
+  });
+
+  tileLayer.addTo(map);
+
+  // Enhanced Bus Stop Marker
+  const busStopIcon = L.divIcon({
+    html: `<div class="stop-marker">🚏</div>`,
     iconSize: [32, 32],
-    iconAnchor: [16, 16]
+    className: 'custom-div-icon'
   });
 
-  const bus2Icon = L.divIcon({
-    className: 'bus-marker bus-marker-2',
-    html: '🚌',
-    iconSize: [32, 32],
-    iconAnchor: [16, 16]
-  });
+  const busStopMarker = L.marker([CONFIG.busStop.lat, CONFIG.busStop.lng], { icon: busStopIcon })
+    .addTo(map)
+    .bindPopup(`
+      <div style="text-align: center; padding: 8px;">
+        <strong>St. Joseph's College of Engineering</strong><br>
+        <span style="color: #64748b;">College Entrance</span><br>
+        <small>Lat: ${CONFIG.busStop.lat}, Lng: ${CONFIG.busStop.lng}</small>
+      </div>
+    `)
+    .openPopup();
 
-  // Custom stop icons
-  const stopIcon = L.divIcon({
-    className: 'stop-marker',
-    html: '🚏',
-    iconSize: [28, 28],
-    iconAnchor: [14, 14]
-  });
+  // Enhanced Bus Markers
+  const createBusIcon = (busId, isActive = false, speed = 0) => {
+    const isRoute2 = busId === 'bus2';
+    let markerClass = isRoute2 ? 'bus-marker bus-marker-2' : 'bus-marker';
+    
+    if (isActive && speed > 0) {
+      markerClass += ' bus-marker-active';
+    }
+    
+    return L.divIcon({
+      html: `<div class="${markerClass}">🚌</div>`,
+      iconSize: [36, 36],
+      className: 'custom-div-icon'
+    });
+  };
 
-  // Create bus markers
-  buses.bus1.marker = L.marker([GANDHIPURAM_COORDS.lat, GANDHIPURAM_COORDS.lon], {icon: bus1Icon})
-    .addTo(map)
-    .bindPopup('<b>🚌 Bus 20A</b><br>Route: Gandhipuram → Somanur<br>Live tracking active');
-  
-  buses.bus2.marker = L.marker([UKKADAM_COORDS.lat, UKKADAM_COORDS.lon], {icon: bus2Icon})
-    .addTo(map)
-    .bindPopup('<b>🚌 Bus 90A</b><br>Route: Ukkadam → Somanur<br>Live tracking active');
+  let markers = {
+    bus1: L.marker([CONFIG.busStop.lat, CONFIG.busStop.lng], { 
+      icon: createBusIcon('bus1') 
+    }).addTo(map),
+    bus2: L.marker([CONFIG.busStop.lat, CONFIG.busStop.lng], { 
+      icon: createBusIcon('bus2') 
+    }).addTo(map)
+  };
 
-  // Create stop markers
-  const gandhipuramMarker = L.marker([GANDHIPURAM_COORDS.lat, GANDHIPURAM_COORDS.lon], {icon: stopIcon})
-    .addTo(map)
-    .bindPopup('<b>🚏 Gandhipuram</b><br>Bus Terminal');
-  
-  const somanurMarker = L.marker([SOMANUR_COORDS.lat, SOMANUR_COORDS.lon], {icon: stopIcon})
-    .addTo(map)
-    .bindPopup('<b>🚏 Somanur</b><br>Bus Stop');
-  
-  const ukkadamMarker = L.marker([UKKADAM_COORDS.lat, UKKADAM_COORDS.lon], {icon: stopIcon})
-    .addTo(map)
-    .bindPopup('<b>🚏 Ukkadam</b><br>Bus Terminal');
-
-  function calculateDistance(lat1, lon1, lat2, lon2) {
-    const R = 6371; // km
+  // Enhanced Utility Functions
+  function getDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371; // Earth's radius in km
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a =
-      Math.sin(dLat/2) * Math.sin(dLat/2) +
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
       Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-      Math.sin(dLon/2) * Math.sin(dLon/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c;
   }
 
-  function updateLastUpdateTime() {
-    const now = new Date();
-    const timeString = now.toLocaleTimeString('en-US', { 
+  function calculateSpeed(currentPos, previousPos, timeDiff) {
+    if (!previousPos || timeDiff <= 0) return 0;
+    
+    const distance = getDistance(
+      previousPos.lat, previousPos.lng,
+      currentPos.lat, currentPos.lng
+    );
+    
+    const hours = timeDiff / (1000 * 60 * 60); // Convert ms to hours
+    return distance / hours;
+  }
+
+  function calculateETA(distance, speed) {
+    if (distance === 0) return 0;
+    if (speed === 0) return Math.round((distance / CONFIG.averageSpeed) * 60);
+    return Math.round((distance / speed) * 60);
+  }
+
+  function formatTime(date) {
+    return date.toLocaleTimeString('en-US', { 
       hour12: false, 
       hour: '2-digit', 
       minute: '2-digit',
       second: '2-digit'
     });
-    document.getElementById('lastUpdate').textContent = timeString;
   }
 
-  function formatTime(minutes) {
-    if (minutes < 1) return '< 1';
-    return minutes.toFixed(1);
+  function formatRelativeTime(date) {
+    const now = new Date();
+    const diff = now - date;
+    const seconds = Math.floor(diff / 1000);
+    const minutes = Math.floor(seconds / 60);
+    
+    if (seconds < 60) return `${seconds}s ago`;
+    if (minutes < 60) return `${minutes}m ago`;
+    return formatTime(date);
   }
 
-  async function updateBusPosition(busKey, busConfig) {
-    try {
-      const url = `https://api.thingspeak.com/channels/${THINGSPEAK_CHANNEL_ID}/feeds.json?api_key=${busConfig.apiKey}&results=1`;
-      const res = await fetch(url);
-      const data = await res.json();
-      
-      if (data.feeds && data.feeds.length > 0) {
-        const latest = data.feeds[0];
-        const lat = parseFloat(latest.field1);
-        const lon = parseFloat(latest.field2);
+  // Enhanced System Status Management
+  function updateSystemStatus(status, message) {
+    const indicators = [
+      document.getElementById('connection-status'),
+      document.getElementById('header-status')
+    ];
+    const texts = [
+      document.getElementById('status-message'),
+      document.getElementById('status-text'),
+      document.getElementById('header-status-text')
+    ];
+    
+    indicators.forEach(indicator => {
+      if (indicator) {
+        indicator.className = `pulse-dot ${status}`;
+      }
+    });
+    
+    texts.forEach(text => {
+      if (text) {
+        text.textContent = message;
+      }
+    });
+  }
 
-        if (!isNaN(lat) && !isNaN(lon)) {
-          // Update bus marker position
-          busConfig.marker.setLatLng([lat, lon]);
-
-          // Calculate distance to destination
-          const distance = calculateDistance(lat, lon, busConfig.endPoint.lat, busConfig.endPoint.lon);
-          const eta = (distance / BUS_SPEED_KMPH) * 60;
-          const formattedEta = formatTime(eta);
-
-          // Update ETA in table and mobile cards based on bus
-          if (busKey === 'bus1') {
-            document.getElementById('table-eta-1').textContent = formattedEta;
-            document.getElementById('mobile-eta-1').textContent = formattedEta;
-          } else {
-            document.getElementById('table-eta-2').textContent = formattedEta;
-            document.getElementById('mobile-eta-2').textContent = formattedEta;
-          }
-
-          return { distance, eta, lat, lon };
+  function updateBusStatus(busId, status, data = {}) {
+    const busNumber = busId.slice(-1);
+    const statusElements = [
+      document.getElementById(`${busId}-status`),
+      document.getElementById(`mobile-status-${busNumber}`)
+    ];
+    
+    const statusText = status === 'active' ? 'Online' : 'Offline';
+    const statusClass = status === 'active' ? 'status-online' : 'status-offline';
+    const mobileStatusClass = status === 'active' ? 'online' : 'offline';
+    
+    statusElements.forEach((element, index) => {
+      if (element) {
+        element.textContent = statusText;
+        if (index === 0) {
+          element.className = statusClass;
+        } else {
+          element.className = `bus-card-status ${mobileStatusClass}`;
         }
       }
-    } catch (err) {
-      console.error(`Error fetching data for ${busKey}:`, err);
+    });
+    
+    appState.buses[busId].status = status;
+  }
+
+  function updateQuickStats() {
+    const buses = Object.values(appState.buses);
+    const activeBuses = buses.filter(bus => bus.status === 'active');
+    
+    // Update active buses count
+    document.getElementById('active-count').textContent = activeBuses.length;
+    appState.systemStatus.activeBuses = activeBuses.length;
+    
+    // Update average distance
+    if (activeBuses.length > 0) {
+      const avgDistance = activeBuses.reduce((sum, bus) => sum + bus.distance, 0) / activeBuses.length;
+      document.getElementById('avg-distance').textContent = avgDistance.toFixed(1);
+      appState.systemStatus.avgDistance = avgDistance;
+      
+      // Update next arrival
+      const nextEta = Math.min(...activeBuses.map(bus => bus.eta).filter(eta => eta > 0));
+      if (nextEta !== Infinity) {
+        document.getElementById('next-eta').textContent = nextEta;
+        appState.systemStatus.nextEta = nextEta;
+      } else {
+        document.getElementById('next-eta').textContent = '--';
+        appState.systemStatus.nextEta = null;
+      }
+    } else {
+      document.getElementById('avg-distance').textContent = '--';
+      document.getElementById('next-eta').textContent = '--';
+      appState.systemStatus.avgDistance = 0;
+      appState.systemStatus.nextEta = null;
     }
-    return null;
+  }
+
+  function updateUI() {
+    if (appState.systemStatus.lastUpdate) {
+      const updateElements = [
+        document.getElementById('lastUpdate')
+      ];
+      
+      updateElements.forEach(element => {
+        if (element) {
+          element.textContent = formatTime(appState.systemStatus.lastUpdate);
+        }
+      });
+    }
+    
+    updateQuickStats();
+  }
+
+  // Enhanced API Functions
+  async function fetchThingSpeakData(channelId, apiKey, isPosition = true) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+    
+    try {
+      const url = `https://api.thingspeak.com/channels/${channelId}/feeds.json?results=1&api_key=${apiKey}`;
+      const response = await fetch(url, {
+        signal: controller.signal,
+        headers: {
+          'Accept': 'application/json',
+        }
+      });
+      
+      clearTimeout(timeoutId);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      
+      if (!data.feeds || data.feeds.length === 0) {
+        throw new Error('No data available');
+      }
+      
+      const feed = data.feeds[0];
+      
+      if (isPosition) {
+        const lat = parseFloat(feed.field1);
+        const lng = parseFloat(feed.field2);
+        
+        if (isNaN(lat) || isNaN(lng) || lat === 0 || lng === 0) {
+          throw new Error('Invalid position data');
+        }
+        
+        return { 
+          lat, 
+          lng, 
+          timestamp: new Date(feed.created_at),
+          raw: feed
+        };
+      } else {
+        const occupancy = parseInt(feed.field1) || 0;
+        return { 
+          occupancy: Math.min(100, Math.max(0, occupancy)), // Clamp between 0-100
+          timestamp: new Date(feed.created_at),
+          raw: feed
+        };
+      }
+    } catch (error) {
+      clearTimeout(timeoutId);
+      if (error.name === 'AbortError') {
+        throw new Error('Request timeout');
+      }
+      throw error;
+    }
+  }
+
+  async function updateBusData(busId, config) {
+    try {
+      // Fetch both position and occupancy data
+      const [positionData, occupancyData] = await Promise.all([
+        fetchThingSpeakData(config.position.id, config.position.key, true),
+        fetchThingSpeakData(config.occupancy.id, config.occupancy.key, false)
+      ]);
+
+      const bus = appState.buses[busId];
+      const currentPos = positionData;
+      
+      // Calculate speed if we have previous position
+      let speed = 0;
+      if (bus.lastPosition && bus.lastUpdate) {
+        const timeDiff = positionData.timestamp - bus.lastUpdate;
+        speed = calculateSpeed(currentPos, bus.lastPosition, timeDiff);
+      }
+
+      // Calculate distance to bus stop
+      const distance = getDistance(
+        currentPos.lat,
+        currentPos.lng,
+        CONFIG.busStop.lat,
+        CONFIG.busStop.lng
+      );
+
+      // Calculate ETA
+      const eta = calculateETA(distance, speed || CONFIG.averageSpeed);
+
+      // Update marker position and appearance
+      const isActive = speed > 0 || distance < 10; // Active if moving or nearby
+      markers[busId].setLatLng([currentPos.lat, currentPos.lng]);
+      markers[busId].setIcon(createBusIcon(busId, isActive, speed));
+      
+      // Enhanced popup with more information
+      markers[busId].bindPopup(`
+        <div style="text-align: center; padding: 12px; min-width: 200px;">
+          <strong>🚌 ${bus.name}</strong><br>
+          <hr style="margin: 8px 0; border: none; border-top: 1px solid #e2e8f0;">
+          <div style="display: flex; justify-content: space-between; margin: 4px 0;">
+            <span>Distance:</span> <strong>${distance.toFixed(2)} km</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin: 4px 0;">
+            <span>ETA:</span> <strong>${eta} min</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin: 4px 0;">
+            <span>Speed:</span> <strong>${speed.toFixed(1)} km/h</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin: 4px 0;">
+            <span>Occupancy:</span> <strong>${occupancyData.occupancy}%</strong>
+          </div>
+          <hr style="margin: 8px 0; border: none; border-top: 1px solid #e2e8f0;">
+          <small style="color: #64748b;">Updated: ${formatRelativeTime(positionData.timestamp)}</small>
+        </div>
+      `);
+
+      // Update UI elements
+      const busNumber = busId.slice(-1);
+      const elements = {
+        distance: document.getElementById(`distance${busNumber}`),
+        eta: document.getElementById(`table-eta-${busNumber}`),
+        seats: document.getElementById(`seats${busNumber}`),
+        mobileDistance: document.getElementById(`mobile-distance-${busNumber}`),
+        mobileEta: document.getElementById(`mobile-eta-${busNumber}`),
+        mobileSeats: document.getElementById(`mobile-seats-${busNumber}`),
+        mobileSpeed: document.getElementById(`mobile-speed-${busNumber}`),
+        mobileUpdate: document.getElementById(`mobile-update-${busNumber}`)
+      };
+
+      // Update all elements with smooth transitions
+      Object.keys(elements).forEach(key => {
+        const element = elements[key];
+        if (element) {
+          let value;
+          switch(key) {
+            case 'distance':
+            case 'mobileDistance':
+              value = distance.toFixed(2);
+              break;
+            case 'eta':
+            case 'mobileEta':
+              value = eta;
+              break;
+            case 'seats':
+            case 'mobileSeats':
+              value = occupancyData.occupancy;
+              break;
+            case 'mobileSpeed':
+              value = speed.toFixed(1);
+              break;
+            case 'mobileUpdate':
+              value = formatRelativeTime(positionData.timestamp);
+              break;
+          }
+          
+          if (element.textContent !== value.toString()) {
+            element.style.opacity = '0.5';
+            setTimeout(() => {
+              element.textContent = value;
+              element.style.opacity = '1';
+            }, 150);
+          }
+        }
+      });
+
+      // Update bus status
+      updateBusStatus(busId, 'active');
+      
+      // Store updated state
+      appState.buses[busId] = {
+        ...bus,
+        lastPosition: currentPos,
+        previousPosition: bus.lastPosition,
+        distance: Number(distance.toFixed(2)),
+        eta,
+        occupancy: occupancyData.occupancy,
+        speed: Number(speed.toFixed(1)),
+        lastUpdate: positionData.timestamp
+      };
+
+      return true;
+    } catch (error) {
+      console.error(`Error updating ${busId}:`, error.message);
+
+      updateBusStatus(busId, 'inactive');
+      
+      // Update UI with offline state
+      const busNumber = busId.slice(-1);
+      const offlineElements = [
+        { id: `distance${busNumber}`, value: '--' },
+        { id: `table-eta-${busNumber}`, value: '--' },
+        { id: `seats${busNumber}`, value: '--' },
+        { id: `mobile-distance-${busNumber}`, value: '--' },
+        { id: `mobile-eta-${busNumber}`, value: '--' },
+        { id: `mobile-seats-${busNumber}`, value: '--' },
+        { id: `mobile-speed-${busNumber}`, value: '--' },
+        { id: `mobile-update-${busNumber}`, value: '--' }
+      ];
+      
+      offlineElements.forEach(({ id, value }) => {
+        const element = document.getElementById(id);
+        if (element) {
+          element.textContent = value;
+          element.style.opacity = '0.6';
+        }
+      });
+      
+      return false;
+    }
   }
 
   async function updateAllBuses() {
+    if (appState.ui.updateInProgress) return;
+    
+    appState.ui.updateInProgress = true;
+    updateSystemStatus('loading', 'Updating bus locations...');
+    
+    const loadingElement = document.getElementById('loading');
+    if (loadingElement) {
+      loadingElement.style.display = 'inline-block';
+    }
+    
     try {
-      document.getElementById('loading').style.display = 'inline-block';
-
-      const updatePromises = Object.entries(buses).map(([key, config]) => 
-        updateBusPosition(key, config)
+      const promises = Object.entries(CONFIG.channels).map(([busId, config]) =>
+        updateBusData(busId, config).catch(error => {
+          console.warn(`Failed to update ${busId}:`, error.message);
+          return false;
+        })
       );
 
-      const results = await Promise.all(updatePromises);
-      
-      // Filter successful updates
-      const validResults = results.filter(result => result !== null);
-      
-      if (validResults.length > 0) {
-        updateLastUpdateTime();
-        
-        // Adjust map view to show all buses and stops if needed
-        const allMarkers = [
-          ...Object.values(buses).map(bus => bus.marker),
-          gandhipuramMarker,
-          somanurMarker,
-          ukkadamMarker
-        ];
-        
-        // Only adjust view on initial load or if explicitly needed
-        if (!window.mapInitialized) {
-          const group = new L.featureGroup(allMarkers);
-          map.fitBounds(group.getBounds().pad(0.1));
-          window.mapInitialized = true;
-        }
+      const results = await Promise.all(promises);
+      const successfulUpdates = results.filter(Boolean).length;
+      const totalBuses = Object.keys(CONFIG.channels).length;
+
+      // Update system status based on results
+      if (successfulUpdates === totalBuses) {
+        updateSystemStatus('', `All systems operational • ${successfulUpdates}/${totalBuses} buses active`);
+        appState.systemStatus.isOnline = true;
+      } else if (successfulUpdates > 0) {
+        updateSystemStatus('loading', `Partial connectivity • ${successfulUpdates}/${totalBuses} buses active`);
+        appState.systemStatus.isOnline = true;
+      } else {
+        updateSystemStatus('error', 'No buses responding • Check connectivity');
+        appState.systemStatus.isOnline = false;
       }
 
-    } catch (err) {
-      console.error("Error updating buses:", err);
+      appState.systemStatus.lastUpdate = new Date();
+      updateUI();
+
+    } catch (error) {
+      console.error('Critical error updating buses:', error);
+      updateSystemStatus('error', 'System error • Retrying...');
+      appState.systemStatus.isOnline = false;
     } finally {
-      document.getElementById('loading').style.display = 'none';
+      appState.ui.updateInProgress = false;
+      const loadingElement = document.getElementById('loading');
+      if (loadingElement) {
+        loadingElement.style.display = 'none';
+      }
     }
   }
 
-  // Initial update
-  updateAllBuses();
-  
-  // Update every 15 seconds
-  setInterval(updateAllBuses, 15000);
+  // Enhanced Initialization
+  function init() {
+    console.log('🚌 Initializing Enhanced Bus Tracker System...');
+    
+    // Set initial UI state
+    updateSystemStatus('loading', 'Initializing tracking system...');
+    
+    // Add map event listeners
+    map.on('zoomend', () => {
+      console.log(`Map zoom level: ${map.getZoom()}`);
+    });
+    
+    map.on('moveend', () => {
+      const center = map.getCenter();
+      console.log(`Map center: ${center.lat.toFixed(4)}, ${center.lng.toFixed(4)}`);
+    });
+    
+    // Initial data fetch
+    setTimeout(() => {
+      updateAllBuses();
+      appState.ui.isInitialized = true;
+    }, 1000);
+    
+    // Set up periodic updates
+    setInterval(updateAllBuses, CONFIG.updateInterval);
+    
+    console.log('✅ Bus tracker system initialized successfully');
+  }
 
-  // Initialize last update time
-  updateLastUpdateTime();
+  // Enhanced Event Listeners
+  document.addEventListener('DOMContentLoaded', init);
 
-  // Handle map resize on orientation change
+  // Handle page visibility changes for battery optimization
+  let visibilityInterval;
+  document.addEventListener('visibilitychange', function() {
+    if (document.hidden) {
+      // Reduce update frequency when page is hidden
+      if (visibilityInterval) clearInterval(visibilityInterval);
+      visibilityInterval = setInterval(updateAllBuses, CONFIG.updateInterval * 3);
+      console.log('📱 Page hidden - reducing update frequency');
+    } else {
+      // Resume normal update frequency
+      if (visibilityInterval) clearInterval(visibilityInterval);
+      updateAllBuses(); // Immediate update when page becomes visible
+      console.log('📱 Page visible - resuming normal updates');
+    }
+  });
+
+  // Handle orientation changes
   window.addEventListener('orientationchange', function() {
     setTimeout(function() {
       map.invalidateSize();
+      console.log('📱 Orientation changed - map resized');
     }, 100);
   });
 
-  // Handle map resize on window resize
+  // Handle window resize
   window.addEventListener('resize', function() {
-    map.invalidateSize();
+    clearTimeout(window.resizeTimer);
+    window.resizeTimer = setTimeout(function() {
+      map.invalidateSize();
+      console.log('💻 Window resized - map adjusted');
+    }, 100);
   });
+
+  // Enhanced error handling
+  window.addEventListener('unhandledrejection', function(event) {
+    console.error('❌ Unhandled promise rejection:', event.reason);
+    updateSystemStatus('error', 'System error - attempting recovery...');
+    
+    // Attempt recovery after 5 seconds
+    setTimeout(() => {
+      if (!appState.systemStatus.isOnline) {
+        updateAllBuses();
+      }
+    }, 5000);
+  });
+
+  // Handle network connectivity
+  window.addEventListener('online', function() {
+    console.log('🌐 Network connection restored');
+    updateSystemStatus('loading', 'Connection restored - updating...');
+    updateAllBuses();
+  });
+
+  window.addEventListener('offline', function() {
+    console.log('📴 Network connection lost');
+    updateSystemStatus('error', 'Network offline - will retry when connected');
+  });
+
+  // Performance monitoring
+  if ('performance' in window) {
+    window.addEventListener('load', function() {
+      setTimeout(function() {
+        const perfData = performance.getEntriesByType('navigation')[0];
+        console.log(`⚡ Page load time: ${perfData.loadEventEnd - perfData.loadEventStart}ms`);
+      }, 0);
+    });
+  }
 </script>
 
 </body>
